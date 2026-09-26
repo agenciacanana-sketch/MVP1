@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e5f6b">
+  <title>Mi membresía</title>
+  <link rel="icon" href="assets/icono.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <style>body { padding-bottom: 24px; }</style>
+</head>
+<body>
+  <header class="barra"><h1 id="titulo">⭐ Mi membresía</h1><span id="chip-demo" class="chip-demo oculto">DEMO</span></header>
+  <main id="vista"></main>
+  <div id="toast" class="toast oculto" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="backend/Nucleo.js"></script>
+  <script src="assets/js/demo.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script>
+  (() => {
+    const $ = s => document.querySelector(s);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fecha = f => Nucleo.util.fechaLarga(f) || '—';
+    const K = 'club_miembro';
+    const toast = (m, err) => { const t = $('#toast'); t.textContent = m; t.className = 'toast' + (err ? ' error' : ''); setTimeout(() => t.classList.add('oculto'), 3500); };
+    const recordado = () => { try { return JSON.parse(localStorage.getItem(K) || 'null'); } catch (e) { return null; } };
+    $('#chip-demo').classList.toggle('oculto', !Api.esDemo);
+
+    function entrada() {
+      $('#vista').innerHTML = `<div class="login"><div class="logo">💈</div>
+        <h2 style="margin:6px 0">Consulta tus puntos y premios</h2>
+        <p class="suave peq">Usa tu celular y el código de miembro de 4 números que te dieron en el negocio.</p>
+        <form id="f" class="tarjeta" style="text-align:left">
+          <label class="campo"><span>Celular</span><input type="tel" name="telefono" inputmode="numeric" required placeholder="3001234567"></label>
+          <label class="campo"><span>Código de miembro</span><input type="tel" name="codigo" inputmode="numeric" maxlength="4" required placeholder="1234"></label>
+          <button class="btn">Ver mi membresía</button></form>
+        ${Api.esDemo ? '<p class="peq suave">Demo: abre la app del dueño, entra a un miembro y usa su celular y código.</p>' : ''}</div>`;
+      $('#f').addEventListener('submit', e => {
+        e.preventDefault();
+        const d = Object.fromEntries(new FormData(e.target));
+        ver(d);
+      });
+    }
+
+    async function ver(cred) {
+      let d;
+      try { d = await Api.llamar('consultaMiembro', cred, ''); }
+      catch (e) { toast(e.message, true); try { localStorage.removeItem(K); } catch (x) {} return entrada(); }
+      try { localStorage.setItem(K, JSON.stringify(cred)); } catch (e) {}
+      document.title = 'Mi membresía · ' + d.negocio;
+      $('#titulo').textContent = '⭐ ' + d.negocio;
+      const m = d.membresia, p = d.progreso;
+      $('#vista').innerHTML = `
+        <div class="carnet ${m && m.activa ? String(d.nivel).toLowerCase() : 'inactivo'}">
+          ${m ? `<div class="codigo">#${esc(m.codigo)}</div>` : ''}
+          <div class="nivel">${esc(d.nivel_icono)} Nivel ${esc(d.nivel)}</div>
+          <div class="titular">${esc(d.nombre)}</div>
+          <div class="plan">${m ? (m.activa ? `${esc(m.plan)} · vence ${fecha(m.vence)}` : `Vencida el ${fecha(m.vence)} — ¡renuévala!`) : ''}</div>
+          <div class="datos"><div><b>${d.puntos}</b><small>puntos</small></div><div><b>${d.total_visitas}</b><small>visitas</small></div></div>
+        </div>
+        ${m && m.beneficios ? `<div class="tarjeta peq"><b>Tus beneficios:</b> ${esc(m.beneficios)}</div>` : ''}
+        <div class="tarjeta">
+          ${p.proximo_premio ? `<p style="margin-top:0">🎁 <b>${esc(p.proximo_premio.nombre)}</b> en <b>${p.proximo_premio.faltan}</b> visita(s)</p>
+            <div class="barra-progreso"><div style="width:${Math.round((p.proximo_premio.cada - p.proximo_premio.faltan) * 100 / p.proximo_premio.cada)}%"></div></div>` : ''}
+          ${p.proximo_nivel ? `<p>${esc(p.proximo_nivel.icono)} Nivel <b>${esc(p.proximo_nivel.nombre)}</b> en <b>${p.proximo_nivel.faltan}</b> visita(s)</p>` : '<p>💎 ¡Tienes el nivel máximo!</p>'}
+          ${p.canjes.map(k => `<p class="peq" style="margin:4px 0">${k.alcanza ? '✅' : '▫️'} ${esc(k.nombre)} — ${k.puntos} pts</p>`).join('')}
+        </div>
+        <div class="seccion-titulo">🎁 Mis premios</div>
+        ${d.recompensas.length ? d.recompensas.map(r => `<div class="premio"><span class="ico">🎁</span><div class="cuerpo"><b>${esc(r.nombre)}</b>
+          <div class="peq suave">Código <span class="codigo-premio">${esc(r.codigo)}</span> · vence ${fecha(r.vence)}</div></div>
+          ${r.transferible ? `<button class="btn chico acento" data-rc="${esc(r.rc_id)}">Regalar</button>` : ''}</div>`).join('')
+          : '<div class="tarjeta vacio peq">Aún no tienes premios. ¡Sigue visitándonos!</div>'}
+        <div class="seccion-titulo">👪 Comparten mi membresía</div>
+        <div class="lista">${d.beneficiarios.length ? d.beneficiarios.map(b => `<div class="item"><div class="avatar b">👪</div><div class="cuerpo"><div class="nombre">${esc(b.nombre)}</div><div class="detalle">${esc(b.parentesco)}</div></div></div>`).join('')
+          : '<div class="vacio peq">Pide en el negocio agregar a un familiar o amigo.</div>'}</div>
+        <div class="botones">
+          ${d.whatsapp_negocio ? `<a class="btn wa" target="_blank" rel="noopener" href="${esc(Nucleo.util.linkWhatsApp(d.whatsapp_negocio, 'Hola, soy ' + d.nombre + ' (miembro #' + (m ? m.codigo : '') + '). Quiero apartar un turno.'))}">💬 Apartar turno</a>` : ''}
+          <button class="btn sec" id="salir">Salir</button></div>`;
+      $('#salir').addEventListener('click', () => { try { localStorage.removeItem(K); } catch (e) {} entrada(); });
+      document.querySelectorAll('[data-rc]').forEach(b => b.addEventListener('click', () => regalar(cred, b.dataset.rc)));
+    }
+
+    function regalar(cred, rcId) {
+      const velo = document.createElement('div');
+      velo.className = 'velo'; velo.id = 'velo';
+      velo.innerHTML = `<div class="hoja"><div class="tirador"></div><h3>🎁 Regalar a un familiar o amigo</h3>
+        <label class="campo"><span>Nombre</span><input type="text" id="rn"></label>
+        <label class="campo"><span>Celular</span><input type="tel" id="rt" inputmode="numeric" placeholder="3001234567"></label>
+        <button class="btn acento" id="ok">Regalar y enviar por WhatsApp</button></div>`;
+      velo.addEventListener('click', e => { if (e.target === velo) velo.remove(); });
+      document.body.appendChild(velo);
+      $('#ok').addEventListener('click', async () => {
+        try {
+          const r = await Api.llamar('regalarPremioMiembro', { ...cred, rc_id: rcId, nombre: $('#rn').value, telefono_amigo: $('#rt').value }, '');
+          velo.remove();
+          window.open(r.link_whatsapp, '_blank');
+          toast('🎁 ¡Premio regalado!');
+          ver(cred);
+        } catch (e) { toast(e.message, true); }
+      });
+    }
+
+    const r = recordado();
+    if (r) ver(r); else entrada();
+  })();
+  </script>
+</body>
+</html>

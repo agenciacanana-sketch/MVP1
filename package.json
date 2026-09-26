@@ -1,0 +1,10 @@
+{
+  "name": "club-membresias-barberias",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MVP de membresías y fidelización para barberías y salones (GitHub Pages + Apps Script + Google Sheets)",
+  "scripts": {
+    "test": "node pruebas/nucleo.test.js && node pruebas/gas-simulado.test.js",
+    "start": "python3 -m http.server 8000"
+  }
+}

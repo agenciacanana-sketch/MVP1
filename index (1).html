@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e5f6b">
+  <meta name="description" content="Membresías, puntos y recordatorios para barberías y salones de belleza.">
+  <title>Club de Membresías</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icono.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icono.svg">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <header class="barra">
+    <button id="btn-atras" class="oculto" aria-label="Atrás">←</button>
+    <h1 id="titulo">Club de Membresías</h1>
+    <span id="chip-demo" class="chip-demo oculto">DEMO</span>
+    <a href="#/ajustes" aria-label="Ajustes" style="text-decoration:none"><button tabindex="-1">⚙️</button></a>
+  </header>
+
+  <main id="vista"><div class="cargando">Cargando…</div></main>
+
+  <nav id="menu" class="menu oculto">
+    <a href="#/inicio" data-r="inicio"><span class="ico">🏠</span>Inicio</a>
+    <a href="#/visita" data-r="visita"><span class="ico">✂️</span>Visita</a>
+    <a href="#/clientes" data-r="clientes"><span class="ico">👥</span>Clientes</a>
+    <a href="#/avisos" data-r="avisos"><span class="ico">🔔</span>Avisos<span id="insignia-avisos" class="insignia oculto"></span></a>
+  </nav>
+
+  <div id="toast" class="toast oculto" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="backend/Nucleo.js"></script>
+  <script src="assets/js/demo.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

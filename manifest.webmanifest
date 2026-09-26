@@ -1,0 +1,11 @@
+{
+  "name": "Club de Membresías",
+  "short_name": "Mi Club",
+  "description": "Membresías, puntos y recordatorios para barberías y salones.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4efe7",
+  "theme_color": "#0e5f6b",
+  "lang": "es-CO",
+  "icons": [{ "src": "assets/icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
