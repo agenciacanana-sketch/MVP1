@@ -1,0 +1,62 @@
+/* Club de Membresías — tutorial de bienvenida (onboarding)
+   Usa las variables de app.css (--primario, --acento, --tinta, --radio...). */
+
+html.ob-bloqueado { overflow: hidden; }
+
+/* Capa transparente: bloquea toques mientras dura el tutorial */
+.ob-capa { position: fixed; inset: 0; z-index: 100; touch-action: none; }
+
+/* Foco: oscurece todo menos la zona resaltada */
+.ob-foco {
+  position: fixed; z-index: 101; pointer-events: none; border-radius: 16px;
+  box-shadow: 0 0 0 3px var(--acento), 0 0 0 9999px rgba(19, 34, 45, .68);
+  transition: top .28s ease, left .28s ease, width .28s ease, height .28s ease, border-radius .28s ease, box-shadow .28s ease;
+}
+.ob-foco.sin-objetivo { border-radius: 0; box-shadow: 0 0 0 9999px rgba(19, 34, 45, .68); }
+
+/* Cuadro con la explicación */
+.ob-cuadro {
+  position: fixed; z-index: 102; width: min(340px, calc(100vw - 24px));
+  background: var(--tarjeta); color: var(--tinta); border-radius: 20px;
+  padding: 18px 16px 12px; box-shadow: 0 12px 34px rgba(19, 34, 45, .35);
+  opacity: 0; transform: translateY(6px); transition: opacity .2s ease, transform .2s ease;
+}
+.ob-cuadro.visible { opacity: 1; transform: none; }
+.ob-cuadro:focus { outline: none; }
+
+.ob-flecha {
+  position: absolute; width: 16px; height: 16px; background: var(--tarjeta);
+  transform: rotate(45deg); border-radius: 3px;
+}
+.ob-cuadro.abajo .ob-flecha { top: -7px; }
+.ob-cuadro.arriba .ob-flecha { bottom: -7px; }
+.ob-cuadro.sin-flecha .ob-flecha { display: none; }
+
+.ob-icono { font-size: 44px; line-height: 1; text-align: center; margin-bottom: 8px; }
+.ob-cuadro h3 { margin: 0 0 6px; font-size: 19px; line-height: 1.25; }
+.ob-cuadro.centrado h3 { text-align: center; font-size: 21px; }
+.ob-cuadro p { margin: 0 0 14px; font-size: 15.5px; color: var(--tinta-suave); }
+.ob-cuadro.centrado p { text-align: center; }
+.ob-cuadro p b { color: var(--tinta); }
+
+.ob-progreso { display: flex; gap: 5px; margin-bottom: 14px; }
+.ob-progreso i { flex: 1; height: 5px; border-radius: 5px; background: var(--borde); transition: background .2s; }
+.ob-progreso i.on { background: var(--primario); }
+
+.ob-botones { display: flex; gap: 8px; }
+.ob-btn {
+  flex: 1; min-height: 46px; border-radius: 14px; border: 2px solid var(--primario);
+  background: var(--primario); color: #fff; font-size: 16px; font-weight: 800; padding: 8px 12px; cursor: pointer;
+}
+.ob-btn.sec { background: #fff; color: var(--primario); }
+.ob-btn:active { transform: scale(.98); }
+.ob-btn:focus-visible, .ob-saltar:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+.ob-saltar {
+  display: block; margin: 6px auto 0; padding: 10px 14px; border: 0; background: none;
+  color: var(--tinta-suave); font-size: 14px; font-weight: 600; text-decoration: underline; cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-foco, .ob-cuadro { transition: none; }
+}
