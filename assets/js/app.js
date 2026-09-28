@@ -600,6 +600,7 @@
         <p class="peq" style="margin-top:0">Comparte este enlace para que tus miembros vean sus puntos y regalen premios a su familia:</p>
         <a class="btn sec" href="miembro.html" target="_blank">🔗 Abrir "Mi membresía"</a></div>
       <div class="tarjeta"><h2>Sesión</h2><div class="botones">
+      <button class="btn sec" id="tutorial">🎓 Ver el tutorial otra vez</button>
         ${Api.esDemo ? '<button class="btn sec" id="reiniciar">♻️ Reiniciar datos de demostración</button>' : ''}
         <button class="btn peligro" id="salir">Cerrar sesión</button></div>
         <p class="peq suave">El PIN, los planes, servicios y premios se cambian en tu Google Sheets (hojas Config, Planes, Servicios, Recompensas).</p>
@@ -621,6 +622,7 @@
     });
     const re = $('#reiniciar');
     if (re) re.addEventListener('click', () => { if (confirm('¿Borrar todo y volver a los datos de ejemplo?')) { DemoBackend.reiniciar(); invalidar(); toast('Demo reiniciada'); } });
+    $('#tutorial').addEventListener('click', () => Onboarding.reiniciar());
     $('#salir').addEventListener('click', () => { Api.pin = ''; E.cat = null; ir('#/login'); });
   }
 
@@ -650,6 +652,7 @@
       main.innerHTML = `<div class="vacio">😕 ${esc(e.message)}<br><br><button class="btn sec" onclick="location.reload()">Reintentar</button></div>`;
     }
     actualizarInsignia();
+      if (window.Onboarding) Onboarding.intentar();
   }
 
   async function actualizarInsignia() {
